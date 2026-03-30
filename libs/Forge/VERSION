@@ -1,0 +1,44 @@
+ForgeDMC Toolkit — Version Registry
+=====================================
+Last updated : 2026-03-21
+Package      : v1.1.0
+
+Core Toolkit                     Version   Status
+─────────────────────────────────────────────────────
+ForgeCore.lua                    v1.0.0    ✓ No changes needed
+ForgeDB.lua                      v1.1.0    ✓ Fixed (constructor was missing)
+ForgeComm.lua                    v1.1.0    ✓ Fixed (renamed + chunking added)
+ForgeHook.lua                    v1.0.0    ✓ No changes needed
+ForgeLocale.lua                  v1.1.0    ✓ Fixed (complete rewrite — was wrong file)
+ForgeOptions.lua                 v1.1.0    ✓ Fixed (renamed + API signature + metatable)
+ForgeTimer.lua                   v1.1.0    ✓ Fixed (invoke self, Throttle, CancelDebounce)
+ForgeWidgets.lua                 v1.1.0    ✓ Fixed (crash bugs, deprecated dropdown, tabs)
+
+Extended Toolkit                 Version   Status
+─────────────────────────────────────────────────────
+ForgeStub.lua                    v1.0.0    ✓ No changes needed
+ForgeBabble.lua                  v1.0.0    ✓ No changes needed
+ForgeBroker.lua                  v1.0.0    ✓ No changes needed
+ForgeMinimapButton.lua           v1.0.0    ✓ No changes needed
+ForgeDialog.lua                  v1.0.0    ✓ No changes needed
+ForgeGeo.lua                     v1.0.0    ✓ No changes needed
+ForgeGlow.lua                    v1.0.0    ✓ No changes needed
+ForgeMedia.lua                   v1.0.0    ✓ No changes needed
+ForgePacker.lua                  v1.0.0    ✓ No changes needed
+ForgeQueue.lua                   v1.0.0    ✓ No changes needed
+ForgeRange.lua                   v1.0.0    ✓ No changes needed
+ForgeSkin.lua                    v1.0.0    ✓ No changes needed
+ForgeWindow.lua                  v1.0.0    ✓ No changes needed
+
+WoW Compatibility
+─────────────────────────────────────────────────────
+Minimum recommended  : Dragonflight 10.0  (full feature set)
+ForgeOptions         : Requires 10.0+     (Blizzard Settings API)
+ForgeWidgets dropdown: TWW 11.0+          (auto-detected; legacy fallback included)
+ForgeMinimapButton   : TWW 11.0+          (AddonCompartment auto-detected)
+ForgeBroker          : TWW 11.0+          (AddonCompartment auto-detected)
+All other modules    : Shadowlands 9.x+   (compatible)
+
+Total modules        : 21
+Total lines          : ~4,150
+External dependencies: 0

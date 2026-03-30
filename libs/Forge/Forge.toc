@@ -1,0 +1,30 @@
+## Interface: 120001
+## Title: Forge Toolkit
+## Notes: ForgeDMC shared library — ForgeCore, ForgeDB, ForgeTimer and all toolkit modules.
+## Author: ForgeDMC
+## Version: 1.1.0
+## DefaultState: enabled
+## LoadOnDemand: 0
+## X-Category: Library
+
+ForgeStub.lua
+ForgeCore.lua
+ForgeDB.lua
+ForgeTimer.lua
+ForgeHook.lua
+ForgeLocale.lua
+ForgeMedia.lua
+ForgeGeo.lua
+ForgeQueue.lua
+ForgePacker.lua
+ForgeComm.lua
+ForgeSkin.lua
+ForgeRange.lua
+ForgeWindow.lua
+ForgeGlow.lua
+ForgeOptions.lua
+ForgeWidgets.lua
+ForgeDialog.lua
+ForgeBroker.lua
+ForgeMinimapButton.lua
+ForgeBabble.lua
