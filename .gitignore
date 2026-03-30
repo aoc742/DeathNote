@@ -26,3 +26,6 @@
 /libs/CallbackHandler-1.0/CallbackHandler-1.0.lua
 /libs/CallbackHandler-1.0/CallbackHandler-1.0.xml
 /libs/LibStub/LibStub.lua
+
+.vscode/
+.DS_Store
