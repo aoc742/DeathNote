@@ -1,10 +1,36 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("DeathNote")
+local DeathNote = ForgeCore:NewAddon("DeathNote")
+local L = ForgeLocale:Get("DeathNote")
 
-DeathNote = LibStub("AceAddon-3.0"):NewAddon("DeathNote", "AceEvent-3.0", "AceTimer-3.0", "AceHook-3.0", "AceConsole-3.0")
+function DeathNote:OnInitialize()
+	-- initialize database
+	self.db = ForgeDB:New("DeathNoteDB", {
+		profile = {
+			scale = 1.0,
+			show = true
+		}
+	})
+	self.settings = self.db.profile
+	self.settings.others_death_time = 0 -- Clean options -- TODO: remove this when implemented
 
--- Bindings text
-BINDING_HEADER_DEATH_NOTE = L["Death Note"]
-BINDING_NAME_DEATH_NOTE_SHOW_TARGET_DEATH = L["Show target deaths"]
+	local options = ForgeOptions:Create("DeathNote", "DeathNote", self.db.profile)
+	options:AddCheckbox("show", "Show", "", true)
+	options:AddSliders("scale", "Scale", "", 0.5, 2.0, 0.1, 1.0)
+	options:Register(self)
+
+	local function ChatCommand(msg)
+		if (msg == "reset") then
+			DeathNote:ResetData();
+			DeathNote:UpdateLDB();
+		else
+			DeathNote:Show();
+		end
+	end
+	self:RegisterChatCommand("dn", ChatCommand)
+	self:RegisterChatCommand("deathnote", ChatCommand)
+
+
+end
+
 
 function DeathNote:OnInitialize()
 	-- AceDB options
