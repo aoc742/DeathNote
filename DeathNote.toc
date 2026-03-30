@@ -1,9 +1,9 @@
-﻿## Interface: 100200
+﻿## Interface: 120001, 120005
 ## Title: DeathNote
 ## Notes: Death analysis tool
 ## Author: Slaren
 ## Version: @project-version@
-## OptionalDeps: LibStub, CallbackHandler-1.0, Ace3
+## OptionalDeps: Forge
 ## SavedVariables: DeathNoteDB
 ## SavedVariablesPerCharacter: DeathNoteData
 ## LoadManagers: AddonLoader
@@ -11,26 +11,37 @@
 ## X-Curse-Project-ID: 28314
 ## X-Wago-ID: VBNBxLKx
 
-#@no-lib-strip@
-libs\LibStub\LibStub.lua
-libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
-#@end-no-lib-strip@
+libs\Forge\ForgeStub.lua
+libs\Forge\ForgeBroker.lua
+libs\Forge\ForgeCore.lua
+libs\Forge\ForgeComm.lua
+libs\Forge\ForgeWidgets.lua
+libs\Forge\ForgeOptions.lua
+libs\Forge\ForgeDB.lua
+libs\Forge\ForgeHook.lua
+libs\Forge\ForgeLocale.lua
+libs\Forge\ForgeTimer.lua
 
-libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+# #@no-lib-strip@
+# libs\LibStub\LibStub.lua
+# libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+# #@end-no-lib-strip@
 
-#@no-lib-strip@
-libs\AceAddon-3.0\AceAddon-3.0.xml
-libs\AceComm-3.0\AceComm-3.0.xml
-libs\AceGUI-3.0\AceGUI-3.0.xml
-libs\AceConfig-3.0\AceConfig-3.0.xml
-libs\AceConsole-3.0\AceConsole-3.0.xml
-libs\AceDB-3.0\AceDB-3.0.xml
-libs\AceEvent-3.0\AceEvent-3.0.xml
-libs\AceHook-3.0\AceHook-3.0.xml
-libs\AceLocale-3.0\AceLocale-3.0.xml
-libs\AceTimer-3.0\AceTimer-3.0.xml
-libs\LibDropDownExtension-1.0\LibDropDownExtension.lua
-#@end-no-lib-strip@
+# libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
+# #@no-lib-strip@
+# libs\AceAddon-3.0\AceAddon-3.0.xml
+# libs\AceComm-3.0\AceComm-3.0.xml
+# libs\AceGUI-3.0\AceGUI-3.0.xml
+# libs\AceConfig-3.0\AceConfig-3.0.xml
+# libs\AceConsole-3.0\AceConsole-3.0.xml
+# libs\AceDB-3.0\AceDB-3.0.xml
+# libs\AceEvent-3.0\AceEvent-3.0.xml
+# libs\AceHook-3.0\AceHook-3.0.xml
+# libs\AceLocale-3.0\AceLocale-3.0.xml
+# libs\AceTimer-3.0\AceTimer-3.0.xml
+# libs\LibDropDownExtension-1.0\LibDropDownExtension.lua
+# #@end-no-lib-strip@
 
 locales\localizations.xml
 DeathNote.lua
