@@ -8,9 +8,9 @@ local skipped_deaths = 0
 local skip_timer
 
 function Announce:AnnounceDeath(death)
-	if not self.settings.announce.enable then return end
+	if not ns.DeathNote.settings.announce.enable then return end
 	local difficultyID = GetRaidDifficultyID();
-	if (difficultyID ~= nil and difficultyID == 17 and not self.settings.announce.lfr) then return end
+	if (difficultyID ~= nil and difficultyID == 17 and not ns.DeathNote.settings.announce.lfr) then return end
 
 	local now = GetTime()
 	local tensecs = now - 10
@@ -21,7 +21,7 @@ function Announce:AnnounceDeath(death)
 		end
 	end
 
-	if #announced_deaths >= self.settings.announce.limit then
+	if #announced_deaths >= ns.DeathNote.settings.announce.limit then
 		skipped_deaths = skipped_deaths + 1
 		self:CancelTimer(skip_timer, true)
 		skip_timer = self:ScheduleTimer("SkipAnnounce", 10)
@@ -30,23 +30,23 @@ function Announce:AnnounceDeath(death)
 
 	local entry, damage, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing =  ns.Data:GetKillingBlow(death)
 
-	local isoutputchat = self:O_IsChatOutput(self.settings.announce.channel)
-	local iswhisper = self.settings.announce.channel == "WHISPER"
+	local isoutputchat = self:O_IsChatOutput(ns.DeathNote.settings.announce.channel)
+	local iswhisper = ns.DeathNote.settings.announce.channel == "WHISPER"
 
 	local text
 
 	if not entry then
-		if self.settings.announce.announce_unknown then
-			text = string.format(L["%s|r has died of a heart attack"], self:FormatUnit(death.GUID, death.name, death.flags, death.raidFlags))
+		if ns.DeathNote.settings.announce.announce_unknown then
+			text = string.format(L["%s|r has died of a heart attack"], ns.Format:FormatUnit(death.GUID, death.name, death.flags, death.raidFlags))
 		else
 			return
 		end
 	else
-		if self.settings.announce.style == "COMBAT_LOG" then
-			text = self:FormatCombatLog(entry)
-		elseif self.settings.announce.style == "FORMATTED" then
-			local source = self:FormatUnit(entry.sourceGUID, entry.sourceName, entry.sourceFlags, entry.sourceRaidFlags)
-			local spell = self:FormatEntrySpell(entry)
+		if ns.DeathNote.settings.announce.style == "COMBAT_LOG" then
+			text = ns.Format:FormatCombatLog(entry)
+		elseif ns.DeathNote.settings.announce.style == "FORMATTED" then
+			local source = ns.Format:FormatUnit(entry.sourceGUID, entry.sourceName, entry.sourceFlags, entry.sourceRaidFlags)
+			local spell = ns.Format:FormatEntrySpell(entry)
 
 			if iswhisper then
 				text = L["You were killed by"] .. " "
@@ -60,11 +60,11 @@ function Announce:AnnounceDeath(death)
 				text = text .. spell
 			end
 
-			if self.settings.announce.format_damage and damage > 0 then
+			if ns.DeathNote.settings.announce.format_damage and damage > 0 then
 				text = text .. string.format(" (%i %s", damage, DAMAGE)
 			end
 
-			if self.settings.announce.format_hittype then
+			if ns.DeathNote.settings.announce.format_hittype then
 				if critical then
 					text = text .. " " .. TEXT_MODE_A_STRING_RESULT_CRITICAL
 				end
@@ -76,11 +76,11 @@ function Announce:AnnounceDeath(death)
 				end
 			end
 
-			if self.settings.announce.format_damage and damage > 0 then
+			if ns.DeathNote.settings.announce.format_damage and damage > 0 then
 				text = text .. ") "
 			end
 
-			if self.settings.announce.format_resist then
+			if ns.DeathNote.settings.announce.format_resist then
 				if resisted and resisted > 0 then
 					text = text .. string.format(TEXT_MODE_A_STRING_RESULT_RESIST, resisted) .. " "
 				end
@@ -92,7 +92,7 @@ function Announce:AnnounceDeath(death)
 				end
 			end
 
-			if self.settings.announce.format_overkill then
+			if ns.DeathNote.settings.announce.format_overkill then
 				if overkill and overkill > 0 then
 					text = text .. string.format(TEXT_MODE_A_STRING_RESULT_OVERKILLING, overkill)
 				end
@@ -103,7 +103,7 @@ function Announce:AnnounceDeath(death)
 	end
 
 	if isoutputchat then
-		text = self:CleanForChat(text)
+		text = ns.Format:CleanForChat(text)
 	else
 		-- add the icon borders back again
 		text = text:gsub("|T(.-):.-|t", "|T%1:0|t")
@@ -113,12 +113,12 @@ function Announce:AnnounceDeath(death)
 		text = { death.name, text }
 	end
 
-	self:O_Send(self.settings.announce.channel, text)
+	ns.Output:O_Send(ns.DeathNote.settings.announce.channel, text)
 
 	table.insert(announced_deaths, now)
 end
 
 function Announce:SkipAnnounce()
-	self:Print(string.format(L["%i more deaths were not announced"], skipped_deaths))
+	ns.DeathNote:Print(string.format(L["%i more deaths were not announced"], skipped_deaths))
 	skipped_deaths = 0
 end

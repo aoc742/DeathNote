@@ -177,7 +177,7 @@ function Output:O_UpdateOutputs()
 	end
 end
 
-function Output:O_Initialize()
+function Output:Initialize()
 	self:O_UpdateOutputs()
 end
 

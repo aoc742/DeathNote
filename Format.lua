@@ -473,7 +473,7 @@ function Format:FormatNameListEntry(death)
 	local name = string.format("[%s] %s", date("%X", death.timestamp), self:FormatUnit(death.GUID, death.name, death.flags, death.raidFlags))
 	local reason = L["Unknown"]
 
-	local entry = ns.DeathNote:GetKillingBlow(death)
+	local entry = ns.Data:GetKillingBlow(death)
 	if entry then
 		reason = self:FormatEntrySpell(entry)
 	end

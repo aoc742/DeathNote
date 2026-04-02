@@ -172,7 +172,7 @@ local event_handler_table = {
 	["UNIT_DIED"] 				= UnitDiedFilter,
 }
 
-function DataCapture:DataCapture_Initialize()
+function DataCapture:Initialize()
 	if not DeathNoteData or (DeathNoteData and (not DeathNoteData.v or DeathNoteData.v < self.CurrentDataVersion)) then
 		DeathNoteData = {
 			v = self.CurrentDataVersion,
@@ -206,7 +206,7 @@ end
 function DataCapture:ResetData(silent)
 	wipe(log)
 	wipe(deaths)
-	self:UpdateNameList()
+	ns.UI:UpdateNameList()
 
 	if not silent then
 		self:Print(L["Data has been reset"])
@@ -217,10 +217,10 @@ end
 local last_clean
 local keep_guid, keep_all = {}, {}
 function DataCapture:CleanData(manual)
-	if manual or self.settings.debugging then debugprofilestart() end
+	if manual or ns.DeathNote.settings.debugging then debugprofilestart() end
 
 	if not self.frame or not self.frame:IsShown() then
-		local count = #deaths - self.settings.max_deaths
+		local count = #deaths - ns.DeathNote.settings.max_deaths
 		for i = 1, count do
 			tremove(deaths, 1)
 		end
@@ -236,8 +236,8 @@ function DataCapture:CleanData(manual)
 	end
 	last_clean = GetTime()
 
-	local death_time = self.settings.death_time
-	local others_death_time = self.settings.others_death_time
+	local death_time = ns.DeathNote.settings.death_time
+	local others_death_time = ns.DeathNote.settings.others_death_time
 	local min_time = deaths[1] and (deaths[1].timestamp - death_time) or 0
 	local max_time = time() - death_time
 
@@ -292,16 +292,16 @@ function DataCapture:CleanData(manual)
 		t = t2
 	end
 
-	if manual or self.settings.debugging then self:Print(string.format(L["Data optimization done in %.02f ms"], debugprofilestop())) end
+	if manual or ns.DeathNote.settings.debugging then self:Print(string.format(L["Data optimization done in %.02f ms"], debugprofilestop())) end
 end
 
 function DataCapture:SetUnitFilter(filter, value)
-	self.settings.unit_filters[filter] = value
+	ns.DeathNote.settings.unit_filters[filter] = value
 	self:UpdateUnitFilters()
 end
 
 function DataCapture:UpdateUnitFilters()
-	local f = self.settings.unit_filters
+	local f = ns.DeathNote.settings.unit_filters
 
 	wipe(unit_filters)
 
@@ -369,7 +369,7 @@ function DataCapture:PLAYER_LEAVING_WORLD()
 end
 
 function DataCapture:OnDatabaseShutdown()
-	if self.settings.keep_data then
+	if ns.DeathNote.settings.keep_data then
 		self:CleanData()
 	else
 		self:ResetData(true)

@@ -4,7 +4,7 @@ local UI = ns.UI
 local L = ForgeLocale:Get("DeathNote")
 -- local libDropdownExtension = ForgeStub:New("LibDropDownExtension-1.0", 3)
 local libDropdownExtension = ForgeStub:Get("LibDropDownExtension-1.0", true)
-if not libDropdownExtension then return end
+-- if not libDropdownExtension then return end
 
 local WindowBackdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -277,6 +277,7 @@ local function GetSelectorEx()
 end
 
 function UI:Show()
+	ns.DeathNote:Print("Hello from UI:Show()")
 	if not self.frame then
 		local AceGUI = LibStub("AceGUI-3.0")
 		local AceConfig = LibStub("AceConfig-3.0")
@@ -284,9 +285,9 @@ function UI:Show()
 
 		local frame = CreateFrame("Frame", "DeathNoteFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 
-		frame:SetWidth(self.settings.display.w)
-		frame:SetHeight(self.settings.display.h)
-		frame:SetPoint("CENTER", UIParent, "CENTER", self.settings.display.x, self.settings.display.y)
+		frame:SetWidth(ns.DeathNote.settings.display.w)
+		frame:SetHeight(ns.DeathNote.settings.display.h)
+		frame:SetPoint("center", UIParent, "center", ns.DeathNote.settings.display.x, ns.DeathNote.settings.display.y)
 		frame:SetBackdrop(WindowBackdrop)
 		frame:SetBackdropColor(0, 0, 0, 1)
 		frame:SetBackdropBorderColor(0.4, 0.4, 0.4)
@@ -345,7 +346,7 @@ function UI:Show()
 		local function save_frame_rect()
 			local _, _, sw, sh = UIParent:GetRect()
 			local x, y, w, h = frame:GetRect()
-			self.settings.display.x, self.settings.display.y, self.settings.display.w, self.settings.display.h =
+			ns.DeathNote.settings.display.x, ns.DeathNote.settings.display.y, ns.DeathNote.settings.display.w, ns.DeathNote.settings.display.h =
 				x + w/2 - sw/2, y + h/2 - sh/2, w, h
 		end
 
@@ -886,7 +887,7 @@ function UI:Show()
 		-- name list
 		local name_list_border = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
 		name_list_border:SetPoint("TOPLEFT", filters_frame, "BOTTOMLEFT", 0, 0)
-		name_list_border:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT", self.settings.display.namelist_width, 10)
+		name_list_border:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT", ns.DeathNote.settings.display.namelist_width, 10)
 
 		name_list_border:SetBackdrop(PaneBackdrop)
 		name_list_border:SetBackdropColor(0.1, 0.1, 0.1, 0.5)
@@ -966,7 +967,7 @@ function UI:Show()
 			name_list_border:ClearAllPoints()
 			name_list_border:SetPoint("TOPLEFT", filters_frame, "BOTTOMLEFT", 0, 0)
 			name_list_border:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT", width, 10)
-			self.settings.display.namelist_width = width
+			ns.DeathNote.settings.display.namelist_width = width
 		end
 
 		dragger:SetScript("OnEnter", Dragger_OnEnter)
@@ -975,26 +976,26 @@ function UI:Show()
 		dragger:SetScript("OnMouseUp", Dragger_OnMouseUp)
 
 		-- logframe
-		local logframe = self:CreateListBox(frame, self.settings.display.scale)
+		local logframe = self:CreateListBox(frame, ns.DeathNote.settings.display.scale)
 		logframe.frame:SetPoint("TOPLEFT", name_list_border, "TOPRIGHT")
 		logframe.frame:SetPoint("BOTTOM", name_list_border, "BOTTOM", 0, 30)
 		logframe.frame:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
 
 		self.logframe = logframe
 
-		logframe:AddColumn(L["Time"], "RIGHT", self.settings.display.columns[1])
-		logframe:AddColumn(L["HP"], "CENTER", self.settings.display.columns[2])
-		logframe:AddColumn(L["Amount"], "RIGHT", self.settings.display.columns[3])
-		logframe:AddColumn(L["Spell"], "LEFT", self.settings.display.columns[4])
+		logframe:AddColumn(L["Time"], "RIGHT", ns.DeathNote.settings.display.columns[1])
+		logframe:AddColumn(L["HP"], "CENTER", ns.DeathNote.settings.display.columns[2])
+		logframe:AddColumn(L["Amount"], "RIGHT", ns.DeathNote.settings.display.columns[3])
+		logframe:AddColumn(L["Spell"], "LEFT", ns.DeathNote.settings.display.columns[4])
 		logframe:AddColumn(L["Source"], "LEFT")
 
 		logframe:SetSettingsCallback(
 			function(columns)
-				self.settings.display.columns = columns
+				ns.DeathNote.settings.display.columns = columns
 			end,
 			function(scale)
 				self:Print(string.format(L["Setting scale to %i%%"], floor(scale * 100 + 0.5)))
-				self.settings.display.scale = scale
+				ns.DeathNote.settings.display.scale = scale
 			end)
 
 		-- logframe searchbox
@@ -1241,25 +1242,27 @@ local function OnEvent(dropdown, event, options)
 	end
 end
 
-libDropdownExtension:RegisterEvent("OnShow OnHide", OnEvent, 1);
+if libDropdownExtension then
+	libDropdownExtension:RegisterEvent("OnShow OnHide", OnEvent, 1);
+end
 
 ------------------------------------------------------------------------------
 -- Display stuff
 ------------------------------------------------------------------------------
 
 function UI:SetNameListDisplay(n)
-	self.settings.display.namelist = n
+	ns.DeathNote.settings.display.namelist = n
 	UI:UpdateNameList()
 	UI:ScrollNameListToCurrentDeath()
 end
 
 function UI:SetTimestampDisplay(n)
-	self.settings.display.timestamp = n
+	ns.DeathNote.settings.display.timestamp = n
 	self:RefreshDeath()
 end
 
 function UI:SetHealthDisplay(n)
-	self.settings.display.health = n
+	ns.DeathNote.settings.display.health = n
 	self:RefreshDeath()
 end
 
@@ -1629,7 +1632,9 @@ GetSortedDeathList[1] = function()
 		tinsert(deaths, v)
 	end
 
-	table.sort(deaths, SortDeathsByNameFunc)
+	if not next(deaths) == nil then
+		table.sort(deaths, SortDeathsByNameFunc)
+	end
 
 	return deaths
 end
@@ -1640,7 +1645,7 @@ GetSortedDeathList[2] = function()
 end
 
 function UI:CycleNameListDisplay()
-	self.settings.display.namelist = self.settings.display.namelist % #GetSortedDeathList + 1
+	ns.DeathNote.settings.display.namelist = ns.DeathNote.settings.display.namelist % #GetSortedDeathList + 1
 end
 
 function UI:UpdateNameList()
@@ -1655,7 +1660,7 @@ function UI:UpdateNameList()
 		self.name_items[i]:Hide()
 	end
 
-	local deaths = GetSortedDeathList[self.settings.display.namelist]()
+	local deaths = GetSortedDeathList[ns.DeathNote.settings.display.namelist]()
 
 	local count = #deaths
 	for i = 1, count do
@@ -1697,7 +1702,7 @@ function UI:UpdateNameList()
 		local btn = self.name_items[i]
 
 		btn.userdata = death
-		local name, reason = self:FormatNameListEntry(death)
+		local name, reason = ns.Format:FormatNameListEntry(death)
 		btn:GetFontString():SetText(name)
 		btn.reasonfs:SetText(reason)
 
@@ -1719,9 +1724,9 @@ end
 ------------------------------------------------------------------------------
 
 function UI:IsTypeConsolidated(etype)
-	return (etype == "DAMAGE" and self.settings.display_filters.consolidate_damage) or
-		(etype == "HEAL" and self.settings.display_filters.consolidate_heals) or
-		(etype == "AURA" and self.settings.display_filters.consolidate_auras)
+	return (etype == "DAMAGE" and ns.DeathNote.settings.display_filters.consolidate_damage) or
+		(etype == "HEAL" and ns.DeathNote.settings.display_filters.consolidate_heals) or
+		(etype == "AURA" and ns.DeathNote.settings.display_filters.consolidate_auras)
 end
 
 local groups = {}
@@ -1737,7 +1742,7 @@ local function AddGroup(etype, entry, highlight_spellid)
 end
 
 function UI:ShowDeath(death)
-	if self.settings.debugging then debugprofilestart() end
+	if ns.DeathNote.settings.debugging then debugprofilestart() end
 
 	wipe(groups)
 
@@ -1748,11 +1753,11 @@ function UI:ShowDeath(death)
 	self:ResetFiltering()
 
 	local entriesCount = 0;
-	for entry in self:IterateDeath(death, self.settings.death_time) do
+	for entry in self:IterateDeath(death, ns.DeathNote.settings.death_time) do
 		self:ProcessDeathEntry(entry);
 
 		entriesCount = entriesCount + 1;
-		if (entriesCount >= self.settings.death_log_entries) then
+		if (entriesCount >= ns.DeathNote.settings.death_log_entries) then
 			break;
 		end
 	end
@@ -1763,7 +1768,7 @@ function UI:ShowDeath(death)
 	self.logframe:UpdateComplete()
 	self.logframe:ScrollToBottom()
 
-	if self.settings.debugging then self:Debug(string.format("Death shown in %.02f ms (%i lines)", debugprofilestop(), self.logframe:GetLineCount())) end
+	if ns.DeathNote.settings.debugging then self:Debug(string.format("Death shown in %.02f ms (%i lines)", debugprofilestop(), self.logframe:GetLineCount())) end
 end
 
 function UI:ProcessDeathEntry(entry)
@@ -1923,7 +1928,7 @@ function UI:AddSpellFilter(entry)
 	local _, spellname = self:GetEntrySpell(entry)
 
 	if spellname then
-		self.settings.display_filters.spell_filter[string.lower(spellname)] = spellname
+		ns.DeathNote.settings.display_filters.spell_filter[string.lower(spellname)] = spellname
 		LibStub("AceConfigDialog-3.0"):Open("Death Note - Others", self.others_tab)
 		self:RefreshFilters()
 		self:ShowFiltersTab(4)
@@ -1937,7 +1942,7 @@ function UI:AddSourceFilter(entry)
 
 	local source = entry.sourceName or ""
 
-	self.settings.display_filters.source_filter[string.lower(source)] = source
+	ns.DeathNote.settings.display_filters.source_filter[string.lower(source)] = source
 	LibStub("AceConfigDialog-3.0"):Open("Death Note - Others", self.others_tab)
 	self:RefreshFilters()
 	self:ShowFiltersTab(4)
@@ -1992,8 +1997,8 @@ function UI:RefreshHighlight()
 				self.logframe:SetLineHighlight(i, line_highlight)
 			end
 			if (ns.DeathNote.settings.quick_spell_search.only_hl) then
-				if (self.settings.searchbox_text ~= nil and self.settings.searchbox_text ~= "") then
-					if (spellName and type(spellName) == "string" and spellName:lower():find(self.settings.searchbox_text:lower())) then
+				if (ns.DeathNote.settings.searchbox_text ~= nil and ns.DeathNote.settings.searchbox_text ~= "") then
+					if (spellName and type(spellName) == "string" and spellName:lower():find(ns.DeathNote.settings.searchbox_text:lower())) then
 						self.logframe:SetLineHighlight(i, { r = 0.5, g  = 0.5, b = 0.5, a = 0.4 })
 					end
 				end
@@ -2019,7 +2024,7 @@ function UI:SetDisplayFilter(filter, value)
 		value = result
 	end
 
-	self.settings.display_filters[filter] = value
+	ns.DeathNote.settings.display_filters[filter] = value
 
 	self:RefreshFilters()
 end

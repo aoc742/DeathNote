@@ -11,22 +11,18 @@ function DeathNote:OnInitialize()
 	self.settings = self.db.profile
 	self.settings.others_death_time = 0 -- Clean options -- TODO: remove this when implemented
 
-	-- self.db = ForgeDB:New("DeathNoteDB", {
-    --     profile = { scale = 1.0, showFrame = true },
-    --     global  = { seenVersion = 0 },
-    -- })
-
 	local options = ForgeOptions:Create("DeathNote", "Death Note", self.db.profile)
-	options:Register(self)
+	options:Register(DeathNote)
+	-- TODO Add table into Blizzard's default Interface options panel
 	-- LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Death Note", L["Death Note"])
 
 
 	local function ChatCommand(msg)
 		if (msg == "reset") then
-			DeathNote:ResetData();
+			ns.DataCapture:ResetData();
 			DeathNote:UpdateLDB();
 		else
-			DeathNote:Show();
+			ns.UI:Show();
 		end
 	end
 	self:RegisterChatCommand({"deathnote", "dn"}, ChatCommand)
@@ -64,9 +60,9 @@ function DeathNote:OnInitialize()
 		DeathNote:ShowUnit(UnitName("player"))
 	end
 
-	self:DataCapture_Initialize()
+	ns.DataCapture:Initialize()
 	
-	self:O_Initialize()
+	ns.Output:Initialize()
 	
 	self:UpdateLDB()
 
@@ -85,7 +81,7 @@ function DeathNote:OnEnable()
 	self:ScheduleRepeatingTimer("UpdateLDB", 5)
 
 	if self.settings.debugging then
-		self:Show()
+		if ns.UI then ns.UI:Show() end
 	end
 end
 
