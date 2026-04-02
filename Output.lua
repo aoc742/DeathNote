@@ -1,29 +1,31 @@
+local name, ns = ...
+ns.Output = {}
+local Output = ns.Output
 local L = ForgeLocale:Get("DeathNote")
-DeathNote = ForgeCore:GetAddon("DeathNote")
 
 local outputs = {}
 
-function DeathNote:O_RegisterOutput(output)
+function Output:O_RegisterOutput(output)
 	outputs[output.key] = output
 end
 
-function DeathNote:O_IsChatOutput(key)
+function Output:O_IsChatOutput(key)
 	return (outputs[key] or outputs["CHATFRAME"]).is_chat
 end
 
-function DeathNote:O_Send(key, msg)
+function Output:O_Send(key, msg)
 	local output = outputs[key]
 	if output then
 		output.func(msg, output.arg)
 	end
 end
 
-function DeathNote:O_IterateOutputs()
+function Output:O_IterateOutputs()
 	return pairs(outputs)
 end
 
 local function printmessage(msg)
-	DeathNote:Print(msg)
+	ns.DeathNote:Print(msg)
 end
 
 local function chatmessage(msg, arg)
@@ -69,7 +71,7 @@ local function ArgsAsKeys(...)
 end
 
 -- Note: this is used un UI.lua too
-function DeathNote:O_GetPlayerChannels()
+function Output:O_GetPlayerChannels()
 	local server_channels = ArgsAsKeys(EnumerateServerChannels())
 	local channels = { GetChannelList() }
 	local result = {}
@@ -85,7 +87,7 @@ function DeathNote:O_GetPlayerChannels()
 	return result
 end
 
-function DeathNote:O_UpdateOutputs()
+function Output:O_UpdateOutputs()
 	outputs = {}
 	
 	self:O_RegisterOutput {
@@ -175,10 +177,10 @@ function DeathNote:O_UpdateOutputs()
 	end
 end
 
-function DeathNote:O_Initialize()
+function Output:O_Initialize()
 	self:O_UpdateOutputs()
 end
 
-function DeathNote:CHANNEL_UI_UPDATE()
+function Output:CHANNEL_UI_UPDATE()
 	self:O_UpdateOutputs()
 end

@@ -1,3 +1,7 @@
+local name, ns = ...
+ns.Data = {}
+local Data = ns.Data
+
 -- Death iterator
 local function DeathIterator(state)
 	repeat
@@ -28,7 +32,7 @@ local function DeathIterator(state)
 	return nil
 end
 
-function DeathNote:IterateDeath(death, maxt)
+function Data:IterateDeath(death, maxt)
 	local state = {
 		guid = death.GUID,
 		death_time = death.timestamp,
@@ -179,31 +183,31 @@ local function GetEntryReader(entry, nreader)
 	local reader = event_reader_table[entry.event] and event_reader_table[entry.event][nreader]
 
 	if reader then
-		return reader(unpack(entry, DeathNote.EntryIndexInfo.eventArgs))
+		return reader(unpack(entry, ns.DeathNote.EntryIndexInfo.eventArgs))
 	end
 end
 
-function DeathNote:GetEntryType(entry)
+function Data:GetEntryType(entry)
 	return GetEntryReader(entry, 1)
 end
 
-function DeathNote:GetEntryDamage(entry)
+function Data:GetEntryDamage(entry)
 	return GetEntryReader(entry, 2)
 end
 
-function DeathNote:GetEntryHeal(entry)
+function Data:GetEntryHeal(entry)
 	return GetEntryReader(entry, 3)
 end
 
-function DeathNote:GetEntrySpell(entry)
+function Data:GetEntrySpell(entry)
 	return GetEntryReader(entry, 4)
 end
 
-function DeathNote:GetEntryAura(entry)
+function Data:GetEntryAura(entry)
 	return GetEntryReader(entry, 5)
 end
 
-function DeathNote:GetKillingBlow(death)
+function Data:GetKillingBlow(death)
 	for entry in self:IterateDeath(death, 20) do
 		local damage, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = self:GetEntryDamage(entry)
 		if overkill and overkill > 0 then
@@ -222,11 +226,11 @@ function DeathNote:GetKillingBlow(death)
 	return nil
 end
 
-function DeathNote:IsEntryGroup(entry)
+function Data:IsEntryGroup(entry)
 	return not not entry.type
 end
 
-function DeathNote:IsEntryOverThreshold(entry)
+function Data:IsEntryOverThreshold(entry)
 	if self:IsEntryGroup(entry) then
 		return self:IsGroupOverThreshold(entry)
 	end
@@ -249,7 +253,7 @@ function DeathNote:IsEntryOverThreshold(entry)
 end
 
 -- returns function, critical arg position
-function DeathNote:GetAmountFunc(type)
+function Data:GetAmountFunc(type)
 	if type == "DAMAGE" then
 		return self.GetEntryDamage, 7
 	elseif type == "HEAL" then
@@ -257,7 +261,7 @@ function DeathNote:GetAmountFunc(type)
 	end
 end
 
-function DeathNote:GetGroupAmount(group)
+function Data:GetGroupAmount(group)
 	local func, critpos = self:GetAmountFunc(group.type)
 
 	if func then
@@ -277,7 +281,7 @@ function DeathNote:GetGroupAmount(group)
 	end
 end
 
-function DeathNote:GetTypeThreshold(type)
+function Data:GetTypeThreshold(type)
 	if type == "DAMAGE" then
 		return self.settings.display_filters.damage_threshold
 	elseif type == "HEAL" then
@@ -285,7 +289,7 @@ function DeathNote:GetTypeThreshold(type)
 	end
 end
 
-function DeathNote:IsGroupOverThreshold(group)
+function Data:IsGroupOverThreshold(group)
 	if group.type == "DAMAGE" and self.settings.display_filters.damage_threshold > 0 then
 		if self:GetGroupAmount(group) < self.settings.display_filters.damage_threshold then
 			return false
@@ -304,17 +308,17 @@ end
 local auras_broken = {} -- dispel, steal, break
 local survival_stack = {}
 local string_find = string.find;
-function DeathNote:ResetFiltering()
+function Data:ResetFiltering()
 	wipe(auras_broken)
 	wipe(survival_stack)
 end
 
 local function prio_insert(survival_stack, spellid)
-	local myprio = DeathNote.SurvivalIDs[spellid].priority
+	local myprio = ns.DeathNote.SurvivalIDs[spellid].priority
 	local pos
 
 	for i = 1, #survival_stack do
-		local thisprio = DeathNote.SurvivalIDs[survival_stack[i]].priority
+		local thisprio = ns.DeathNote.SurvivalIDs[survival_stack[i]].priority
 		if thisprio >= myprio then
 			pos = i
 			break
@@ -328,7 +332,7 @@ local function prio_insert(survival_stack, spellid)
 	end
 end
 
-function DeathNote:IsEntryFiltered(entry)
+function Data:IsEntryFiltered(entry)
 	-- hack to remove obnoxious events that will never be shown unless a filter is added for them
 	local event = entry.event
 	if event == "SPELL_AURA_REFRESH" or event == "SPELL_CAST_START" or event == "SPELL_CAST_SUCCESS" then
@@ -396,7 +400,7 @@ function DeathNote:IsEntryFiltered(entry)
 	-- SearchBox filtering
 	if (self.settings.searchbox_text ~= nil and self.settings.searchbox_text ~= "") then
 		local _, spellname = self:GetEntrySpell(entry);
-		if (DeathNote.settings.quick_spell_search.only_hl) then
+		if (ns.DeathNote.settings.quick_spell_search.only_hl) then
 			
 		else
 			if (spellname == nil) then

@@ -1,4 +1,8 @@
-local DeathNote = ForgeCore:NewAddon("DeathNote")
+local addon, ns = ...
+
+ns.DeathNote = ForgeCore:NewAddon("DeathNote")
+local DeathNote = ns.DeathNote
+
 local L = ForgeLocale:Get("DeathNote")
 
 function DeathNote:OnInitialize()
@@ -6,6 +10,11 @@ function DeathNote:OnInitialize()
 	self.db = ForgeDB:New("DeathNoteDB", self.OptionsDefaults)
 	self.settings = self.db.profile
 	self.settings.others_death_time = 0 -- Clean options -- TODO: remove this when implemented
+
+	-- self.db = ForgeDB:New("DeathNoteDB", {
+    --     profile = { scale = 1.0, showFrame = true },
+    --     global  = { seenVersion = 0 },
+    -- })
 
 	local options = ForgeOptions:Create("DeathNote", "Death Note", self.db.profile)
 	options:Register(self)
@@ -24,31 +33,31 @@ function DeathNote:OnInitialize()
 
 
 	-- Register data broker object for clicking minimap icon
-	self.ldb = ForgeBroker:Register("DeathNote", {
-		icon = "Interface\\AddOns\\DeathNote\\Textures\\icon.tga",
-		label = "|cFF8F8F8F" .. L["Death Note"] .. "|r",
-		OnClick = function(self, button)
-			if button == "LeftButton" then
-				if IsShiftKeyDown() then
-					DeathNote:CleanData(true)
-					collectgarbage("collect")
-					DeathNote:UpdateLDB()
-				elseif IsControlKeyDown() then
-					DeathNote:ResetData()
-					DeathNote:UpdateLDB()
-				else
-					DeathNote:ShowUnit(UnitName("target"))
-				end
-			elseif button == "RightButton" then
-				InterfaceOptionsFrame_OpenToCategory(L["Death Note"])
-			end
-		end,
-		OnTooltipShow = function(tooltip)
-			tooltip:AddLine(L["Death Note"])
-			tooltip:AddLine(L["|cFFEDA55FClick|r to open Death Note. |cFFEDA55FRight-Click|r to show options. |cFFEDA55FShift-Click|r to optimize data. |cFFEDA55FCtrl-Click|r to reset data."], 0.2, 1, 0.2, 1)
-		end,
+	-- self.ldb = ForgeBroker:Register("DeathNote", {
+	-- 	icon = "Interface\\AddOns\\DeathNote\\Textures\\icon.tga",
+	-- 	label = "|cFF8F8F8F" .. L["Death Note"] .. "|r",
+	-- 	OnClick = function(self, button)
+	-- 		if button == "LeftButton" then
+	-- 			if IsShiftKeyDown() then
+	-- 				DeathNote:CleanData(true)
+	-- 				collectgarbage("collect")
+	-- 				DeathNote:UpdateLDB()
+	-- 			elseif IsControlKeyDown() then
+	-- 				DeathNote:ResetData()
+	-- 				DeathNote:UpdateLDB()
+	-- 			else
+	-- 				DeathNote:ShowUnit(UnitName("target"))
+	-- 			end
+	-- 		elseif button == "RightButton" then
+	-- 			InterfaceOptionsFrame_OpenToCategory(L["Death Note"])
+	-- 		end
+	-- 	end,
+	-- 	OnTooltipShow = function(tooltip)
+	-- 		tooltip:AddLine(L["Death Note"])
+	-- 		tooltip:AddLine(L["|cFFEDA55FClick|r to open Death Note. |cFFEDA55FRight-Click|r to show options. |cFFEDA55FShift-Click|r to optimize data. |cFFEDA55FCtrl-Click|r to reset data."], 0.2, 1, 0.2, 1)
+	-- 	end,
 
-	}, self.db.profile)
+	-- }, self.db.profile)
 
 	-- Override default Blizzard death recap button
 	OpenDeathRecapUI = function ()
@@ -64,7 +73,7 @@ function DeathNote:OnInitialize()
 end
 
 function DeathNote:OnEnable()
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	-- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("CHAT_MSG_SYSTEM")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 	self:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -106,6 +115,7 @@ function DeathNote:Debug(...)
 end
 
 function DeathNote:UpdateLDB()
+	if not self.ldb then return end
 	self.ldb.text = string.format(L["%i deaths"], #DeathNoteData.deaths)
 end
 

@@ -1,9 +1,11 @@
+local name, ns = ...
+ns.DataCapture = {}
+local DataCapture = ns.DataCapture
 local L = ForgeLocale:Get("DeathNote")
-DeathNote = ForgeCore:GetAddon("DeathNote")
 
-DeathNote.CurrentDataVersion = 1
+DataCapture.CurrentDataVersion = 1
 
-DeathNote.EntryIndexInfo = {
+DataCapture.EntryIndexInfo = {
 	hp					= 1,
 	hpMax				= 2,
 	cleArgs				= 3,
@@ -21,7 +23,7 @@ DeathNote.EntryIndexInfo = {
 	eventArgs			= 14,
 }
 
-DeathNote.DeathIndexInfo = {
+DataCapture.DeathIndexInfo = {
 	timestamp			= 1,
 	GUID				= 2,
 	name				= 3,
@@ -30,8 +32,8 @@ DeathNote.DeathIndexInfo = {
 }
 
 
-local eii = DeathNote.EntryIndexInfo
-local dii = DeathNote.DeathIndexInfo
+local eii = DataCapture.EntryIndexInfo
+local dii = DataCapture.DeathIndexInfo
 
 local entrymeta = {
 	__index = function(self, idx)
@@ -59,7 +61,7 @@ local deaths
 
 local unit_filters = {}
 
-function DeathNote:AddDeath(timestamp, destGUID, destName, destFlags, destRaidFlags)
+function DataCapture:AddDeath(timestamp, destGUID, destName, destFlags, destRaidFlags)
 	local death = { timestamp, destGUID, destName, destFlags, destRaidFlags }
 	setmetatable(death, deathmeta)
 	tinsert(deaths, death)
@@ -72,7 +74,7 @@ end
 
 local function UnitDiedFilter(timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags)
 	if destName and not UnitIsFeignDeath(destName) then
-		DeathNote:AddDeath(timestamp, destGUID, destName, destFlags, destRaidFlags)
+		DataCapture:AddDeath(timestamp, destGUID, destName, destFlags, destRaidFlags)
 	end
 end
 
@@ -96,7 +98,7 @@ local function FindPlayerInfo(name)
 	end
 end
 
-function DeathNote:CHAT_MSG_SYSTEM(_, msg)
+function DataCapture:CHAT_MSG_SYSTEM(_, msg)
 	local found, _, pwin, ploss
 	found, _, pwin, ploss = string.find(msg, DUEL_WINNER_KNOCKOUT_PATTERN)
 	
@@ -107,7 +109,7 @@ function DeathNote:CHAT_MSG_SYSTEM(_, msg)
 	if found then
 		local destGUID, destName, destFlags, destRaidFlags = FindPlayerInfo(ploss)
 		if destGUID then
-			DeathNote:CombatLogHandler(
+			DataCapture:CombatLogHandler(
 				time() + 5,						-- timestamp
 				"UNIT_DIED",                 	-- event
 				false,                          -- hideCaster
@@ -170,7 +172,7 @@ local event_handler_table = {
 	["UNIT_DIED"] 				= UnitDiedFilter,
 }
 
-function DeathNote:DataCapture_Initialize()
+function DataCapture:DataCapture_Initialize()
 	if not DeathNoteData or (DeathNoteData and (not DeathNoteData.v or DeathNoteData.v < self.CurrentDataVersion)) then
 		DeathNoteData = {
 			v = self.CurrentDataVersion,
@@ -201,7 +203,7 @@ function DeathNote:DataCapture_Initialize()
 	self:UpdateUnitFilters()
 end
 
-function DeathNote:ResetData(silent)
+function DataCapture:ResetData(silent)
 	wipe(log)
 	wipe(deaths)
 	self:UpdateNameList()
@@ -214,7 +216,7 @@ end
 
 local last_clean
 local keep_guid, keep_all = {}, {}
-function DeathNote:CleanData(manual)
+function DataCapture:CleanData(manual)
 	if manual or self.settings.debugging then debugprofilestart() end
 
 	if not self.frame or not self.frame:IsShown() then
@@ -293,12 +295,12 @@ function DeathNote:CleanData(manual)
 	if manual or self.settings.debugging then self:Print(string.format(L["Data optimization done in %.02f ms"], debugprofilestop())) end
 end
 
-function DeathNote:SetUnitFilter(filter, value)
+function DataCapture:SetUnitFilter(filter, value)
 	self.settings.unit_filters[filter] = value
 	self:UpdateUnitFilters()
 end
 
-function DeathNote:UpdateUnitFilters()
+function DataCapture:UpdateUnitFilters()
 	local f = self.settings.unit_filters
 
 	wipe(unit_filters)
@@ -348,25 +350,25 @@ function DeathNote:UpdateUnitFilters()
 	end
 end
 
-function DeathNote:PLAYER_REGEN_DISABLED()
+function DataCapture:PLAYER_REGEN_DISABLED()
 	self:CancelTimer(self.clean_timer, true)
 end
 
-function DeathNote:PLAYER_REGEN_ENABLED()
+function DataCapture:PLAYER_REGEN_ENABLED()
 	self.clean_timer = self:ScheduleTimer("CleanData", 15)
 end
 
-function DeathNote:PLAYER_FLAGS_CHANGED(_, unitid)
+function DataCapture:PLAYER_FLAGS_CHANGED(_, unitid)
 	if unitid == "player" and UnitIsAFK("player") then
 		self:CleanData()
 	end
 end
 
-function DeathNote:PLAYER_LEAVING_WORLD()
+function DataCapture:PLAYER_LEAVING_WORLD()
 	self:CleanData()
 end
 
-function DeathNote:OnDatabaseShutdown()
+function DataCapture:OnDatabaseShutdown()
 	if self.settings.keep_data then
 		self:CleanData()
 	else
@@ -438,7 +440,7 @@ local function GetUnitHealth(name, guid)
 	end
 end
 
-function DeathNote:CombatLogHandler(timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24)
+function DataCapture:CombatLogHandler(timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22, arg23, arg24)
 	local handler = event_handler_table[event]
 	if handler and IsFiltered(sourceFlags, destFlags) then
 		-- local hp, hpmax = destName and UnitHealth(destName) or 0, destName and UnitHealthMax(destName) or 0
@@ -461,6 +463,6 @@ function DeathNote:CombatLogHandler(timestamp, event, hideCaster, sourceGUID, so
 	end
 end
 
-function DeathNote:COMBAT_LOG_EVENT_UNFILTERED()
-	DeathNote:CombatLogHandler(CombatLogGetCurrentEventInfo());
-end
+-- function DataCapture:COMBAT_LOG_EVENT_UNFILTERED()
+-- 	DataCapture:CombatLogHandler(CombatLogGetCurrentEventInfo());
+-- end

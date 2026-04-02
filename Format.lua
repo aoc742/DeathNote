@@ -1,5 +1,7 @@
+local name, ns = ...
+ns.Format = {}
+local Format = ns.Format
 local L = ForgeLocale:Get("DeathNote")
-DeathNote = ForgeCore:GetAddon("DeathNote")
 
 local tinsert, tremove = table.insert, table.remove
 local floor = math.floor
@@ -35,7 +37,7 @@ end
 
 local FormatTimestamp = {}
 FormatTimestamp[1] = function(timestamp)
-	return string.format("%.01f s", floor((timestamp - DeathNote.current_death.timestamp) * 10 + 0.05) / 10)
+	return string.format("%.01f s", floor((timestamp - ns.DeathNote.current_death.timestamp) * 10 + 0.05) / 10)
 end
 
 FormatTimestamp[2] = function(timestamp)
@@ -101,7 +103,7 @@ local function GetUnitColor(guid, unit, flags)
 	end
 end
 
-function DeathNote:FormatUnit(guid, name, flags, raidflags)
+function Format:FormatUnit(guid, name, flags, raidflags)
 	if not name then
 		return ""
 	end
@@ -396,7 +398,7 @@ local event_formatter_table = {
 ------------------------------------------------------------------------------
 
 local function GetGroupFormatInfo(group)
-	local func = DeathNote:GetAmountFunc(group.type)
+	local func = ns.Data:GetAmountFunc(group.type)
 
 	local spells = {}
 	local sources = {}
@@ -408,11 +410,11 @@ local function GetGroupFormatInfo(group)
 		local event = entry.event
 		local formatter = event_formatter_table[event]
 		if formatter and formatter[1] then
-			local _, spell, source = formatter[1](unpack(entry, DeathNote.EntryIndexInfo.eventArgs))
+			local _, spell, source = formatter[1](unpack(entry, ns.DeathNote.EntryIndexInfo.eventArgs))
 			if not source or source == "" then
 				if entry.sourceName then
 					if not guid_name_cache[entry.sourceGUID] then
-						guid_name_cache[entry.sourceGUID] = DeathNote:FormatUnit(entry.sourceGUID, entry.sourceName, entry.sourceFlags, entry.sourceRaidFlags)
+						guid_name_cache[entry.sourceGUID] = Format:FormatUnit(entry.sourceGUID, entry.sourceName, entry.sourceFlags, entry.sourceRaidFlags)
 					end
 					source = guid_name_cache[entry.sourceGUID]
 				else
@@ -424,7 +426,7 @@ local function GetGroupFormatInfo(group)
 				spell = "|cFFFFFFFF" .. L["Unknown"] .. "|r"
 			end
 
-			local amount = func and func(DeathNote, entry) or 0
+			local amount = func and func(ns.DeathNote, entry) or 0
 
 			local spellv = spells[spell] or { amount = 0, hits = 0 }
 			spellv.amount = spellv.amount + amount
@@ -441,21 +443,21 @@ local function GetGroupFormatInfo(group)
 	return spells, sources
 end
 
-function DeathNote:CycleTimestampDisplay()
+function Format:CycleTimestampDisplay()
 	self.settings.display.timestamp = self.settings.display.timestamp % #FormatTimestamp + 1
 end
 
-function DeathNote:CycleHealthDisplay()
+function Format:CycleHealthDisplay()
 	self.settings.display.health = self.settings.display.health % #FormatHealth + 1
 end
 
-function DeathNote:FormatEntrySpell(entry)
+function Format:FormatEntrySpell(entry)
 	local event = entry.event
 	local formatter = event_formatter_table[event]
 	local _, spell
 
 	if formatter and formatter[1] then
-		_, spell, _ = formatter[1](unpack(entry, DeathNote.EntryIndexInfo.eventArgs))
+		_, spell, _ = formatter[1](unpack(entry, ns.DeathNote.EntryIndexInfo.eventArgs))
 	else
 		return nil
 	end
@@ -467,11 +469,11 @@ end
 -- Name List
 ------------------------------------------------------------------------------
 
-function DeathNote:FormatNameListEntry(death)
+function Format:FormatNameListEntry(death)
 	local name = string.format("[%s] %s", date("%X", death.timestamp), self:FormatUnit(death.GUID, death.name, death.flags, death.raidFlags))
 	local reason = L["Unknown"]
 
-	local entry = self:GetKillingBlow(death)
+	local entry = ns.DeathNote:GetKillingBlow(death)
 	if entry then
 		reason = self:FormatEntrySpell(entry)
 	end
@@ -483,11 +485,11 @@ end
 -- Chat
 ------------------------------------------------------------------------------
 
-function DeathNote:FormatChatTimestamp(entry)
+function Format:FormatChatTimestamp(entry)
 	return FormatTimestamp[self.settings.display.timestamp](entry.timestamp)
 end
 
-function DeathNote:FormatChatHealth(entry)
+function Format:FormatChatHealth(entry)
 	return FormatHealthFull(entry.hp, entry.hpMax)
 end
 
@@ -502,7 +504,7 @@ local iconBitMap = {
 	[COMBATLOG_OBJECT_RAIDTARGET8] = "{rt8}",
 }
 
-function DeathNote:CleanForChat(text)
+function Format:CleanForChat(text)
 	return text:
 		gsub("(|c........)", ""):
 		gsub("(|r)", ""):
@@ -513,26 +515,26 @@ function DeathNote:CleanForChat(text)
 		gsub("(|Haction.-|h(.-)|h)", "%2")
 end
 
-function DeathNote:FormatCombatLog(entry)
+function Format:FormatCombatLog(entry)
 	return CombatLog_OnEvent(DEFAULT_COMBATLOG_FILTER_TEMPLATE, unpack(entry, DeathNote.EntryIndexInfo.cleArgs)) or ""
 end
 
-function DeathNote:FormatChatAmount(entry)
+function Format:FormatChatAmount(entry)
 	return self:CleanForChat(self:FormatCombatLog(entry))
 end
 
-function DeathNote:FormatChatSpell(entry)
+function Format:FormatChatSpell(entry)
 	local event = entry.event
 	local formatter = event_formatter_table[event]
 
 	if formatter and formatter[2] then
-		return formatter[2](unpack(entry, DeathNote.EntryIndexInfo.eventArgs))
+		return formatter[2](unpack(entry, ns.DeathNote.EntryIndexInfo.eventArgs))
 	else
 		return ""
 	end
 end
 
-function DeathNote:FormatChatSource(entry)
+function Format:FormatChatSource(entry)
 	return self:CleanForChat(self:FormatUnit(entry.sourceGUID, entry.sourceName, entry.sourceFlags, entry.sourceRaidFlags))
 end
 
@@ -540,7 +542,7 @@ end
 -- Tooltip (single)
 ------------------------------------------------------------------------------
 
-function DeathNote:FormatTooltipTimestamp(tip, entry)
+function Format:FormatTooltipTimestamp(tip, entry)
 	if self:IsEntryGroup(entry) then
 		return self:FormatTooltipTimestampGroup(tip, entry)
 	end
@@ -550,7 +552,7 @@ function DeathNote:FormatTooltipTimestamp(tip, entry)
 	return tip
 end
 
-function DeathNote:FormatTooltipHealth(tip, entry)
+function Format:FormatTooltipHealth(tip, entry)
 	if self:IsEntryGroup(entry) then
 		return self:FormatTooltipHealthGroup(tip, entry)
 	end
@@ -559,12 +561,12 @@ function DeathNote:FormatTooltipHealth(tip, entry)
 	return tip
 end
 
-function DeathNote:FormatTooltipAmount(tip, entry)
+function Format:FormatTooltipAmount(tip, entry)
 	if self:IsEntryGroup(entry) then
 		return self:FormatTooltipAmountGroup(tip, entry)
 	end
 
-	local text, r, g, b = CombatLog_OnEvent(DEFAULT_COMBATLOG_FILTER_TEMPLATE, unpack(entry, DeathNote.EntryIndexInfo.cleArgs))
+	local text, r, g, b = CombatLog_OnEvent(DEFAULT_COMBATLOG_FILTER_TEMPLATE, unpack(entry, ns.DeathNote.EntryIndexInfo.cleArgs))
 	if text then
 		tip:SetText(text, r, g, b)
 		return tip
@@ -573,7 +575,7 @@ function DeathNote:FormatTooltipAmount(tip, entry)
 	end
 end
 
-function DeathNote:FormatTooltipSpell(tip, entry)
+function Format:FormatTooltipSpell(tip, entry)
 	if self:IsEntryGroup(entry) then
 		return self:FormatTooltipSpellGroup(tip, entry)
 	end
@@ -582,13 +584,13 @@ function DeathNote:FormatTooltipSpell(tip, entry)
 	local formatter = event_formatter_table[event]
 
 	if formatter and formatter[3] then
-		return formatter[3](tip, unpack(entry, DeathNote.EntryIndexInfo.eventArgs))
+		return formatter[3](tip, unpack(entry, ns.DeathNote.EntryIndexInfo.eventArgs))
 	else
 		return false
 	end
 end
 
-function DeathNote:FormatTooltipSource(tip, entry)
+function Format:FormatTooltipSource(tip, entry)
 	if self:IsEntryGroup(entry) then
 		return self:FormatTooltipSourceGroup(tip, entry)
 	end
@@ -607,7 +609,7 @@ end
 
 local max_tip_lines = 15
 
-function DeathNote:FormatTooltipTimestampGroup(tip, group)
+function Format:FormatTooltipTimestampGroup(tip, group)
 	local first = group[1]
 	local last = group[#group]
 
@@ -624,14 +626,14 @@ function DeathNote:FormatTooltipTimestampGroup(tip, group)
 	return tip
 end
 
-function DeathNote:FormatTooltipHealthGroup(tip, group)
+function Format:FormatTooltipHealthGroup(tip, group)
 	local entry = group[1]
 
 	tip:SetText(FormatHealthFull(entry.hp, entry.hpMax))
 	return tip
 end
 
-function DeathNote:FormatTooltipAmountGroup(tip, group)
+function Format:FormatTooltipAmountGroup(tip, group)
 	local limited
 	if #group > max_tip_lines then
 		limited = true
@@ -641,7 +643,7 @@ function DeathNote:FormatTooltipAmountGroup(tip, group)
 
 	for i = #group, math.max(#group - max_tip_lines + 1 + (limited and 1 or 0), 1), -1 do
 		local entry = group[i]
-		local text, r, g, b = CombatLog_OnEvent(DEFAULT_COMBATLOG_FILTER_TEMPLATE, unpack(entry, DeathNote.EntryIndexInfo.cleArgs))
+		local text, r, g, b = CombatLog_OnEvent(DEFAULT_COMBATLOG_FILTER_TEMPLATE, unpack(entry, ns.DeathNote.EntryIndexInfo.cleArgs))
 		tip:AddLine(text, r, g, b)
 	end
 
@@ -696,12 +698,12 @@ local function FormatTooltipList(tip, type, list)
 	return tip
 end
 
-function DeathNote:FormatTooltipSpellGroup(tip, group)
+function Format:FormatTooltipSpellGroup(tip, group)
 	local spells = GetGroupFormatInfo(group)
 	return FormatTooltipList(tip, group.type, spells)
 end
 
-function DeathNote:FormatTooltipSourceGroup(tip, group)
+function Format:FormatTooltipSourceGroup(tip, group)
 	local _, sources = GetGroupFormatInfo(group)
 	return FormatTooltipList(tip, group.type, sources)
 end
@@ -710,7 +712,7 @@ end
 -- Entry
 ------------------------------------------------------------------------------
 
-function DeathNote:FormatEntry(entry)
+function Format:FormatEntry(entry)
 	if self:IsEntryGroup(entry) then
 		return self:FormatGroupEntry(entry)
 	end
@@ -720,7 +722,7 @@ function DeathNote:FormatEntry(entry)
 	local amount, spell, source
 
 	if formatter and formatter[1] then
-		amount, spell, source = formatter[1](unpack(entry, DeathNote.EntryIndexInfo.eventArgs))
+		amount, spell, source = formatter[1](unpack(entry, ns.DeathNote.EntryIndexInfo.eventArgs))
 	else
 		amount, spell, source = "No handler", event, ""
 	end
@@ -746,15 +748,15 @@ local function FormatGroupTimestamp(group)
 	local last = group[#group]
 
 	if first.timestamp == last.timestamp then
-		return FormatTimestamp[DeathNote.settings.display.timestamp](last.timestamp)
+		return FormatTimestamp[ns.DeathNote.settings.display.timestamp](last.timestamp)
 	else
-		return string.format("%s|cFFFFFFFF .. |r%s", FormatTimestamp[DeathNote.settings.display.timestamp](last.timestamp), FormatTimestamp[DeathNote.settings.display.timestamp](first.timestamp))
+		return string.format("%s|cFFFFFFFF .. |r%s", FormatTimestamp[ns.DeathNote.settings.display.timestamp](last.timestamp), FormatTimestamp[ns.DeathNote.settings.display.timestamp](first.timestamp))
 	end
 end
 
 local function FormatGroupHealth(group)
 	local entry = group[1]
-	return FormatHealth[DeathNote.settings.display.health](entry.hp, entry.hpMax)
+	return FormatHealth[ns.DeathNote.settings.display.health](entry.hp, entry.hpMax)
 end
 
 local function FormatGroupInfo(group, limit)
@@ -797,7 +799,7 @@ local function FormatGroupInfo(group, limit)
 	return spellsstr, sourcesstr
 end
 
-function DeathNote:GetGroupAurasInfo(group)
+function Format:GetGroupAurasInfo(group)
 	local auras = {
 		BUFF = { gain = 0, fade = 0 },
 		DEBUFF = { gain = 0, fade = 0 },
@@ -819,14 +821,12 @@ function DeathNote:GetGroupAurasInfo(group)
 end
 
 local function FormatGroupAmount(group)
-	local self = DeathNote
-
 	if group.type == "DAMAGE" then
-		return string.format("(x%i) %s", #group, FormatDamage(self:GetGroupAmount(group)))
+		return string.format("(x%i) %s", #group, FormatDamage(ns.DeathNote:GetGroupAmount(group)))
 	elseif group.type == "HEAL" then
-		return string.format("(x%i) %s", #group, FormatHeal(self:GetGroupAmount(group)))
+		return string.format("(x%i) %s", #group, FormatHeal(ns.DeathNote:GetGroupAmount(group)))
 	elseif group.type == "AURA" then
-		local auras = self:GetGroupAurasInfo(group)
+		local auras = ns.DeathNote:GetGroupAurasInfo(group)
 
 		local rlist = {}
 		if auras.BUFF.gain > 0 then
@@ -851,7 +851,7 @@ local function FormatGroupAmount(group)
 	end
 end
 
-function DeathNote:FormatGroupEntry(group)
+function Format:FormatGroupEntry(group)
 	if #group == 1 then
 		return self:FormatEntry(group[1])
 	end
@@ -871,7 +871,7 @@ end
 -- Reports
 ------------------------------------------------------------------------------
 
-function DeathNote:FormatReportCombatLog(entry, channel, target)
+function Format:FormatReportCombatLog(entry, channel, target)
 	if self.report_line_count >= self.settings.report.max_lines then
 		return
 	end
@@ -888,7 +888,7 @@ function DeathNote:FormatReportCombatLog(entry, channel, target)
 	end
 end
 
-function DeathNote:FormatReportCompact(entry, channel, target)
+function Format:FormatReportCompact(entry, channel, target)
 	if self.report_line_count >= self.settings.report.max_lines then
 		return
 	end

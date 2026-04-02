@@ -1,11 +1,13 @@
+local name, ns = ...
+ns.Announce = {}
+local Announce = ns.Announce
 local L = ForgeLocale:Get("DeathNote")
-DeathNote = ForgeCore:GetAddon("DeathNote")
 
 local announced_deaths = {}
 local skipped_deaths = 0
 local skip_timer
 
-function DeathNote:AnnounceDeath(death)
+function Announce:AnnounceDeath(death)
 	if not self.settings.announce.enable then return end
 	local difficultyID = GetRaidDifficultyID();
 	if (difficultyID ~= nil and difficultyID == 17 and not self.settings.announce.lfr) then return end
@@ -26,7 +28,7 @@ function DeathNote:AnnounceDeath(death)
 		return
 	end
 
-	local entry, damage, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing =  DeathNote:GetKillingBlow(death)
+	local entry, damage, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing =  ns.Data:GetKillingBlow(death)
 
 	local isoutputchat = self:O_IsChatOutput(self.settings.announce.channel)
 	local iswhisper = self.settings.announce.channel == "WHISPER"
@@ -116,7 +118,7 @@ function DeathNote:AnnounceDeath(death)
 	table.insert(announced_deaths, now)
 end
 
-function DeathNote:SkipAnnounce()
+function Announce:SkipAnnounce()
 	self:Print(string.format(L["%i more deaths were not announced"], skipped_deaths))
 	skipped_deaths = 0
 end
