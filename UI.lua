@@ -277,7 +277,6 @@ local function GetSelectorEx()
 end
 
 function UI:Show()
-	ns.DeathNote:Print("Hello from UI:Show()")
 	if not self.frame then
 		local AceGUI = LibStub("AceGUI-3.0")
 		local AceConfig = LibStub("AceConfig-3.0")
@@ -382,9 +381,9 @@ function UI:Show()
 		end)
 
 		-- filters
-		local filters_frame = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
-		filters_frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -30)
-		filters_frame:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+		local filters_frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
+		filters_frame:SetPoint("topleft", frame, "topleft", 10, -30)
+		filters_frame:SetPoint("right", frame, "right", -10, 0)
 		filters_frame:SetHeight(30)
 		filters_frame:SetFrameStrata("DIALOG"); -- todo: quick fix
 
@@ -1573,8 +1572,8 @@ local function NameList_OnClick(frame, button)
 	if button == "LeftButton" then
 		UI:ShowDeath(frame.userdata)
 
-		for i = 1, #ns.DeathNote.name_items do
-			ns.DeathNote.name_items[i]:UnlockHighlight()
+		for i = 1, #ns.UI.name_items do
+			ns.UI.name_items[i]:UnlockHighlight()
 		end
 
 		frame:LockHighlight()
@@ -1750,10 +1749,10 @@ function UI:ShowDeath(death)
 
 	self.current_death = death
 
-	self:ResetFiltering()
+	ns.Data:ResetFiltering()
 
 	local entriesCount = 0;
-	for entry in self:IterateDeath(death, ns.DeathNote.settings.death_time) do
+	for entry in ns.Data:IterateDeath(death, ns.DeathNote.settings.death_time) do
 		self:ProcessDeathEntry(entry);
 
 		entriesCount = entriesCount + 1;
