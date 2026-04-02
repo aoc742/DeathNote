@@ -7,10 +7,10 @@ function DeathNote:OnInitialize()
 	self.settings = self.db.profile
 	self.settings.others_death_time = 0 -- Clean options -- TODO: remove this when implemented
 
-	local options = ForgeOptions:Create("DeathNote", "DeathNote", self.db.profile)
-	options:AddCheckbox("show", "Show", "", true)
-	options:AddSliders("scale", "Scale", "", 0.5, 2.0, 0.1, 1.0)
+	local options = ForgeOptions:Create("DeathNote", "Death Note", self.db.profile)
 	options:Register(self)
+	-- LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Death Note", L["Death Note"])
+
 
 	local function ChatCommand(msg)
 		if (msg == "reset") then
@@ -21,40 +21,12 @@ function DeathNote:OnInitialize()
 		end
 	end
 	self:RegisterChatCommand({"deathnote", "dn"}, ChatCommand)
-end
 
 
-function DeathNote:OnInitialize()
-	-- AceDB options
-	self.db = LibStub("AceDB-3.0"):New("DeathNoteDB", self.OptionsDefaults)
-	self.settings = self.db.profile
-	
-	-- Clean options -- TODO: remove this when implemented
-	self.settings.others_death_time = 0
-
-	-- Register options
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("Death Note", self.Options)
-	LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Death Note", L["Death Note"])
-	
-	local function ChatCommand(msg)
-		if (msg == "reset") then
-			DeathNote:ResetData();
-			DeathNote:UpdateLDB();
-		else
-			DeathNote:Show();
-		end
-	end
-	
-	-- Register slash commands
-	self:RegisterChatCommand("deathnote", ChatCommand)
-	self:RegisterChatCommand("dn", ChatCommand)
-
-	-- Register LDB object
-	self.ldb = LibStub("LibDataBroker-1.1"):NewDataObject("Death Note", {
-		type = "data source",
+	-- Register data broker object for clicking minimap icon
+	self.ldb = ForgeBroker:Register("DeathNote", {
+		icon = "Interface\\AddOns\\DeathNote\\Textures\\icon.tga",
 		label = "|cFF8F8F8F" .. L["Death Note"] .. "|r",
-		text = "|cFF8F8F8F" .. L["Death Note"] .. "|r",
-		icon = [[Interface\AddOns\DeathNote\Textures\icon.tga]],
 		OnClick = function(self, button)
 			if button == "LeftButton" then
 				if IsShiftKeyDown() then
@@ -75,9 +47,10 @@ function DeathNote:OnInitialize()
 			tooltip:AddLine(L["Death Note"])
 			tooltip:AddLine(L["|cFFEDA55FClick|r to open Death Note. |cFFEDA55FRight-Click|r to show options. |cFFEDA55FShift-Click|r to optimize data. |cFFEDA55FCtrl-Click|r to reset data."], 0.2, 1, 0.2, 1)
 		end,
-	})
-	
-	-- Take over the Blizzard death recap button
+
+	}, self.db.profile)
+
+	-- Override default Blizzard death recap button
 	OpenDeathRecapUI = function ()
 		DeathNote:ShowUnit(UnitName("player"))
 	end
@@ -87,6 +60,7 @@ function DeathNote:OnInitialize()
 	self:O_Initialize()
 	
 	self:UpdateLDB()
+
 end
 
 function DeathNote:OnEnable()
