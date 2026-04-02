@@ -527,7 +527,7 @@ function UI:Show()
 		damage_tab.frame:Hide()
 		damage_tab:SetPoint("TOPLEFT", 8, -8)
 		damage_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		AceConfig:RegisterOptionsTable("Death Note - Damage", damage_options)
+		ForgeOptions:Create(name, "Death Note - Damage", damage_options)
 		AceConfigDialog:Open("Death Note - Damage", damage_tab)
 
 		-- healing tab
@@ -597,7 +597,8 @@ function UI:Show()
 		healing_tab.frame:Hide()
 		healing_tab:SetPoint("TOPLEFT", 8, -8)
 		healing_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		AceConfig:RegisterOptionsTable("Death Note - Healing", healing_options)
+		-- AceConfig:RegisterOptionsTable("Death Note - Healing", healing_options)
+		ForgeOptions:Create(name, "Death Note - Healing", healing_options)
 		AceConfigDialog:Open("Death Note - Healing", healing_tab)
 
 		-- auras tab
@@ -745,7 +746,8 @@ function UI:Show()
 		auras_tab.frame:SetScale(0.9)
 		auras_tab:SetPoint("TOPLEFT", 8, -8)
 		auras_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		AceConfig:RegisterOptionsTable("Death Note - Auras", auras_options)
+		-- AceConfig:RegisterOptionsTable("Death Note - Auras", auras_options)
+		ForgeOptions:Create(name, "Death Note - Auras", auras_options)
 		AceConfigDialog:Open("Death Note - Auras", auras_tab)
 
 		-- others tab
@@ -821,7 +823,8 @@ function UI:Show()
 		others_tab.frame:SetScale(0.9)
 		others_tab:SetPoint("TOPLEFT", 8, -8)
 		others_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		AceConfig:RegisterOptionsTable("Death Note - Others", others_options)
+		-- AceConfig:RegisterOptionsTable("Death Note - Others", others_options)
+		ForgeOptions:Create(name, "Death Note - Others", others_options)
 		AceConfigDialog:Open("Death Note - Others", others_tab)
 
 		-- final tab setup
