@@ -70,13 +70,13 @@ end
 
 function DeathNote:OnEnable()
 	-- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("CHAT_MSG_SYSTEM")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED")
-	self:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self:RegisterEvent("PLAYER_FLAGS_CHANGED")
-	self:RegisterEvent("PLAYER_LEAVING_WORLD")
-	self:RegisterEvent("CHANNEL_UI_UPDATE")
-	self.db.RegisterCallback(self, "OnDatabaseShutdown")
+	self:RegisterEvent("CHAT_MSG_SYSTEM", ns.DataCapture.CHAT_MSG_SYSTEM)
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", ns.DataCapture.PLAYER_REGEN_ENABLED)
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", ns.DataCapture)
+	self:RegisterEvent("PLAYER_FLAGS_CHANGED", ns.DataCapture.PLAYER_FLAGS_CHANGED)
+	self:RegisterEvent("PLAYER_LEAVING_WORLD", ns.DataCapture.PLAYER_LEAVING_WORLD)
+	self:RegisterEvent("CHANNEL_UI_UPDATE", ns.DataCapture.CHANNEL_UI_UPDATE)
+	self.db.RegisterCallback("OnProfileChanged", ns.DataCapture.OnProfileChanged)
 
 	self:ScheduleRepeatingTimer("UpdateLDB", 5)
 

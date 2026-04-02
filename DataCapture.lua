@@ -368,7 +368,8 @@ function DataCapture:PLAYER_LEAVING_WORLD()
 	self:CleanData()
 end
 
-function DataCapture:OnDatabaseShutdown()
+-- Replaced OnDatabaseShutdown from Ace3 library
+function DataCapture:OnProfileChanged()
 	if ns.DeathNote.settings.keep_data then
 		self:CleanData()
 	else
