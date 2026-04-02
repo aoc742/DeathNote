@@ -1,4 +1,5 @@
-local L = LibStub("AceLocale-3.0"):GetLocale("DeathNote")
+local L = ForgeLocale:Get("DeathNote")
+DeathNote = ForgeCore:GetAddon("DeathNote")
 
 local announced_deaths = {}
 local skipped_deaths = 0
