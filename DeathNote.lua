@@ -25,8 +25,7 @@ function DeathNote:OnInitialize()
 			DeathNote:Show();
 		end
 	end
-	self:RegisterChatCommand("dn", ChatCommand)
-	self:RegisterChatCommand("deathnote", ChatCommand)
+	self:RegisterChatCommand({"deathnote", "dn"}, ChatCommand)
 
 
 end
