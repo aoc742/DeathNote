@@ -278,7 +278,6 @@ end
 
 function UI:Show()
 	if not self.frame then
-		local AceGUI = LibStub("AceGUI-3.0")
 		local AceConfig = LibStub("AceConfig-3.0")
 		local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
@@ -521,7 +520,8 @@ function UI:Show()
 			},
 		}
 
-		local damage_tab = AceGUI:Create("SimpleGroup")
+		-- local damage_tab = AceGUI:Create("SimpleGroup")
+		local damage_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Damage")
 		damage_tab.frame:SetParent(filters_tab)
 		damage_tab.frame:SetScale(0.9)
 		damage_tab.frame:Hide()
@@ -590,7 +590,8 @@ function UI:Show()
 			},
 		}
 
-		local healing_tab = AceGUI:Create("SimpleGroup")
+		-- local healing_tab = AceGUI:Create("SimpleGroup")
+		local healing_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Healing")
 		healing_tab.frame:SetParent(filters_tab)
 		healing_tab.frame:SetScale(0.9)
 		healing_tab.frame:Hide()
@@ -738,7 +739,8 @@ function UI:Show()
 			},
 		}
 
-		local auras_tab = AceGUI:Create("SimpleGroup")
+		-- local auras_tab = AceGUI:Create("SimpleGroup")
+		local auras_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Auras")
 		auras_tab.frame:SetParent(filters_tab)
 		auras_tab.frame:SetScale(0.9)
 		auras_tab:SetPoint("TOPLEFT", 8, -8)
@@ -814,6 +816,7 @@ function UI:Show()
 		}
 
 		local others_tab = AceGUI:Create("SimpleGroup")
+		local others_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Others")
 		others_tab.frame:SetParent(filters_tab)
 		others_tab.frame:SetScale(0.9)
 		others_tab:SetPoint("TOPLEFT", 8, -8)
