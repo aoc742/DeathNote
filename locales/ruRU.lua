@@ -1,4 +1,6 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("DeathNote", "ruRU");
+-- local L = LibStub("AceLocale-3.0"):NewLocale("DeathNote", "ruRU");
+local L = ForgeLocale:Register("DeathNote", "ruRU")
+
 L = L or {}
 --[===[@non-debug@
 @localization(locale="ruRU", format="lua_additive_table", handle-unlocalized="english", table-name="L")@
