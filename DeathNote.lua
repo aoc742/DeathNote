@@ -3,12 +3,7 @@ local L = ForgeLocale:Get("DeathNote")
 
 function DeathNote:OnInitialize()
 	-- initialize database
-	self.db = ForgeDB:New("DeathNoteDB", {
-		profile = {
-			scale = 1.0,
-			show = true
-		}
-	})
+	self.db = ForgeDB:New("DeathNoteDB", self.OptionsDefaults)
 	self.settings = self.db.profile
 	self.settings.others_death_time = 0 -- Clean options -- TODO: remove this when implemented
 
@@ -26,8 +21,6 @@ function DeathNote:OnInitialize()
 		end
 	end
 	self:RegisterChatCommand({"deathnote", "dn"}, ChatCommand)
-
-
 end
 
 
