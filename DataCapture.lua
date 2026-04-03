@@ -225,7 +225,7 @@ function DataCapture:CleanData(manual)
 			tremove(deaths, 1)
 		end
 
-		self:UpdateNameList()
+		ns.UI:UpdateNameList()
 	end
 
 	-- limits number of automatic cleans over time

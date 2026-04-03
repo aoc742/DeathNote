@@ -66,17 +66,20 @@ function DeathNote:OnInitialize()
 	
 	self:UpdateLDB()
 
+	-- Enables ability to call SchedulerRepeatingTimer in OnEnable
+	ForgeTimer:Embed(DeathNote)
+
 end
 
 function DeathNote:OnEnable()
 	-- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("CHAT_MSG_SYSTEM", ns.DataCapture.CHAT_MSG_SYSTEM)
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", ns.DataCapture.PLAYER_REGEN_ENABLED)
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", ns.DataCapture)
-	self:RegisterEvent("PLAYER_FLAGS_CHANGED", ns.DataCapture.PLAYER_FLAGS_CHANGED)
-	self:RegisterEvent("PLAYER_LEAVING_WORLD", ns.DataCapture.PLAYER_LEAVING_WORLD)
-	self:RegisterEvent("CHANNEL_UI_UPDATE", ns.DataCapture.CHANNEL_UI_UPDATE)
-	self.db.RegisterCallback("OnProfileChanged", ns.DataCapture.OnProfileChanged)
+	self:RegisterEvent("CHAT_MSG_SYSTEM", function(...) ns.DataCapture:CHAT_MSG_SYSTEM(...) end)
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", function(...) ns.DataCapture:PLAYER_REGEN_ENABLED(...) end)
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", function(...) ns.DataCapture:PLAYER_REGEN_DISABLED(...) end)
+	self:RegisterEvent("PLAYER_FLAGS_CHANGED", function(...) ns.DataCapture:PLAYER_FLAGS_CHANGED(...) end)
+	self:RegisterEvent("PLAYER_LEAVING_WORLD", function(...) ns.DataCapture:PLAYER_LEAVING_WORLD(...) end)
+	self:RegisterEvent("CHANNEL_UI_UPDATE", function(...) ns.DataCapture:CHANNEL_UI_UPDATE(...) end)
+	-- self.db.RegisterCallback("OnProfileChanged", function() end)
 
 	self:ScheduleRepeatingTimer("UpdateLDB", 5)
 

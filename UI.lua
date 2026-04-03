@@ -1,4 +1,4 @@
-local name, ns = ...
+local dn, ns = ...
 ns.UI = {}
 local UI = ns.UI
 local L = ForgeLocale:Get("DeathNote")
@@ -278,9 +278,6 @@ end
 
 function UI:Show()
 	if not self.frame then
-		local AceConfig = LibStub("AceConfig-3.0")
-		local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-
 		local frame = CreateFrame("Frame", "DeathNoteFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 
 		frame:SetWidth(ns.DeathNote.settings.display.w)
@@ -380,7 +377,7 @@ function UI:Show()
 		end)
 
 		-- filters
-		local filters_frame = CreateFrame("Frame", nil, UIParent, BackdropTemplateMixin and "BackdropTemplate")
+		local filters_frame = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
 		filters_frame:SetPoint("topleft", frame, "topleft", 10, -30)
 		filters_frame:SetPoint("right", frame, "right", -10, 0)
 		filters_frame:SetHeight(30)
@@ -520,15 +517,15 @@ function UI:Show()
 			},
 		}
 
-		-- local damage_tab = AceGUI:Create("SimpleGroup")
 		local damage_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Damage")
-		damage_tab.frame:SetParent(filters_tab)
-		damage_tab.frame:SetScale(0.9)
-		damage_tab.frame:Hide()
+		damage_tab:SetParent(filters_tab)
+		damage_tab:SetScale(0.9)
+		damage_tab:Hide()
 		damage_tab:SetPoint("TOPLEFT", 8, -8)
 		damage_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		ForgeOptions:Create(name, "Death Note - Damage", damage_options)
-		AceConfigDialog:Open("Death Note - Damage", damage_tab)
+		local dmg_opts = ForgeOptions:Create(dn, "Death Note - Damage", damage_options)
+		dmg_opts:Register(ns.DeathNote)
+		-- dmg_opts:Open()
 
 		-- healing tab
 		local healing_tab_button = CreateFrame("Button", "DeathNoteFiltersTab2", filters_tab, "OptionsFrameTabButtonTemplate")
@@ -590,16 +587,15 @@ function UI:Show()
 			},
 		}
 
-		-- local healing_tab = AceGUI:Create("SimpleGroup")
 		local healing_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Healing")
-		healing_tab.frame:SetParent(filters_tab)
-		healing_tab.frame:SetScale(0.9)
-		healing_tab.frame:Hide()
+		healing_tab:SetParent(filters_tab)
+		healing_tab:SetScale(0.9)
+		healing_tab:Hide()
 		healing_tab:SetPoint("TOPLEFT", 8, -8)
 		healing_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		-- AceConfig:RegisterOptionsTable("Death Note - Healing", healing_options)
-		ForgeOptions:Create(name, "Death Note - Healing", healing_options)
-		AceConfigDialog:Open("Death Note - Healing", healing_tab)
+		local healing_opts =ForgeOptions:Create(dn, "Death Note - Healing", healing_options)
+		healing_opts:Register(ns.DeathNote)
+		-- healing_opts:Open()
 
 		-- auras tab
 		local auras_tab_button = CreateFrame("Button", "DeathNoteFiltersTab3", filters_tab, "OptionsFrameTabButtonTemplate")
@@ -740,15 +736,14 @@ function UI:Show()
 			},
 		}
 
-		-- local auras_tab = AceGUI:Create("SimpleGroup")
 		local auras_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Auras")
-		auras_tab.frame:SetParent(filters_tab)
-		auras_tab.frame:SetScale(0.9)
+		auras_tab:SetParent(filters_tab)
+		auras_tab:SetScale(0.9)
 		auras_tab:SetPoint("TOPLEFT", 8, -8)
 		auras_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		-- AceConfig:RegisterOptionsTable("Death Note - Auras", auras_options)
-		ForgeOptions:Create(name, "Death Note - Auras", auras_options)
-		AceConfigDialog:Open("Death Note - Auras", auras_tab)
+		local auras_opts = ForgeOptions:Create(dn, "Death Note - Auras", auras_options)
+		auras_opts:Register(ns.DeathNote)
+		-- auras_opts:Open()
 
 		-- others tab
 		local others_tab_button = CreateFrame("Button", "DeathNoteFiltersTab4", filters_tab, "OptionsFrameTabButtonTemplate")
@@ -817,15 +812,14 @@ function UI:Show()
 			},
 		}
 
-		local others_tab = AceGUI:Create("SimpleGroup")
 		local others_tab = ForgeWidgets:CreateInlineGroup(filters_tab, "Death Note - Others")
-		others_tab.frame:SetParent(filters_tab)
-		others_tab.frame:SetScale(0.9)
+		others_tab:SetParent(filters_tab)
+		others_tab:SetScale(0.9)
 		others_tab:SetPoint("TOPLEFT", 8, -8)
 		others_tab:SetPoint("BOTTOMRIGHT", -8, 8)
-		-- AceConfig:RegisterOptionsTable("Death Note - Others", others_options)
-		ForgeOptions:Create(name, "Death Note - Others", others_options)
-		AceConfigDialog:Open("Death Note - Others", others_tab)
+		local others_opts = ForgeOptions:Create(dn, "Death Note - Others", others_options)
+		others_opts:Register(ns.DeathNote)
+		-- others_opts:Open()
 
 		-- final tab setup
 		self.filters_label = filters_label
@@ -1112,10 +1106,10 @@ function UI:SetFiltersTab(ntab)
 		self.others_tab_spacer1:Hide()
 		self.others_tab_spacer2:Hide()
 
-		self.damage_tab.frame:Show()
-		self.healing_tab.frame:Hide()
-		self.auras_tab.frame:Hide()
-		self.others_tab.frame:Hide()
+		self.damage_tab:Show()
+		self.healing_tab:Hide()
+		self.auras_tab:Hide()
+		self.others_tab:Hide()
 	elseif ntab == 2 then
 		self.damage_tab_spacer1:Hide()
 		self.healing_tab_spacer1:Show()
@@ -1125,10 +1119,10 @@ function UI:SetFiltersTab(ntab)
 		self.others_tab_spacer1:Hide()
 		self.others_tab_spacer2:Hide()
 
-		self.damage_tab.frame:Hide()
-		self.healing_tab.frame:Show()
-		self.auras_tab.frame:Hide()
-		self.others_tab.frame:Hide()
+		self.damage_tab:Hide()
+		self.healing_tab:Show()
+		self.auras_tab:Hide()
+		self.others_tab:Hide()
 	elseif ntab == 3 then
 		self.damage_tab_spacer1:Hide()
 		self.healing_tab_spacer1:Hide()
@@ -1138,10 +1132,10 @@ function UI:SetFiltersTab(ntab)
 		self.others_tab_spacer1:Hide()
 		self.others_tab_spacer2:Hide()
 
-		self.damage_tab.frame:Hide()
-		self.healing_tab.frame:Hide()
-		self.auras_tab.frame:Show()
-		self.others_tab.frame:Hide()
+		self.damage_tab:Hide()
+		self.healing_tab:Hide()
+		self.auras_tab:Show()
+		self.others_tab:Hide()
 	elseif ntab == 4 then
 		self.damage_tab_spacer1:Hide()
 		self.healing_tab_spacer1:Hide()
@@ -1151,10 +1145,10 @@ function UI:SetFiltersTab(ntab)
 		self.others_tab_spacer1:Show()
 		self.others_tab_spacer2:Show()
 
-		self.damage_tab.frame:Hide()
-		self.healing_tab.frame:Hide()
-		self.auras_tab.frame:Hide()
-		self.others_tab.frame:Show()
+		self.damage_tab:Hide()
+		self.healing_tab:Hide()
+		self.auras_tab:Hide()
+		self.others_tab:Show()
 	end
 end
 

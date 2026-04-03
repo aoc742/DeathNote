@@ -15,6 +15,7 @@ libs\Forge\ForgeStub.lua
 libs\Forge\ForgeBroker.lua
 libs\Forge\ForgeCore.lua
 libs\Forge\ForgeComm.lua
+libs\Forge\ForgeDialog.lua
 libs\Forge\ForgeWidgets.lua
 libs\Forge\ForgeOptions.lua
 libs\Forge\ForgeDB.lua
