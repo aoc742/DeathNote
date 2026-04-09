@@ -9,6 +9,7 @@ function DeathNote:OnInitialize()
 	-- initialize database
 	self.db = ForgeDB:New("DeathNoteDB", self.OptionsDefaults)
 	self.settings = self.db.profile
+	self.settings.debugging = true
 	self.settings.others_death_time = 0 -- Clean options -- TODO: remove this when implemented
 
 	local options = ForgeOptions:Create("DeathNote", "Death Note", self.db.profile)
@@ -25,7 +26,14 @@ function DeathNote:OnInitialize()
 			ns.UI:Show();
 		end
 	end
+
+	local function testChat(msg)
+		DeathNote:Print(msg)
+		ns.DeathEvents:Test()
+	end
+	
 	self:RegisterChatCommand({"deathnote", "dn"}, ChatCommand)
+	self:RegisterChatCommand({"test"}, testChat)
 
 
 	-- Register data broker object for clicking minimap icon
@@ -56,13 +64,15 @@ function DeathNote:OnInitialize()
 	-- }, self.db.profile)
 
 	-- Override default Blizzard death recap button
-	OpenDeathRecapUI = function ()
-		DeathNote:ShowUnit(UnitName("player"))
-	end
+	-- OpenDeathRecapUI = function ()
+	-- 	ns.UI:ShowUnit(UnitName("player"))
+	-- end
 
 	ns.DataCapture:Initialize()
 	
 	ns.Output:Initialize()
+
+	ns.DeathEvents:Initialize()
 	
 	self:UpdateLDB()
 
@@ -73,12 +83,15 @@ end
 
 function DeathNote:OnEnable()
 	-- self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	self:RegisterEvent("CHAT_MSG_SYSTEM", function(...) ns.DataCapture:CHAT_MSG_SYSTEM(...) end)
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", function(...) ns.DataCapture:PLAYER_REGEN_ENABLED(...) end)
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", function(...) ns.DataCapture:PLAYER_REGEN_DISABLED(...) end)
-	self:RegisterEvent("PLAYER_FLAGS_CHANGED", function(...) ns.DataCapture:PLAYER_FLAGS_CHANGED(...) end)
-	self:RegisterEvent("PLAYER_LEAVING_WORLD", function(...) ns.DataCapture:PLAYER_LEAVING_WORLD(...) end)
-	self:RegisterEvent("CHANNEL_UI_UPDATE", function(...) ns.DataCapture:CHANNEL_UI_UPDATE(...) end)
+	-- self:RegisterEvent("UNIT_DIED", ns.DataCapture.UNIT_DIED)
+	-- self:RegisterEvent("COMBAT_LOG_MESSAGE", ns.DataCapture.COMBAT_LOG_MESSAGE)
+
+	self:RegisterEvent("CHAT_MSG_SYSTEM", ns.DataCapture.CHAT_MSG_SYSTEM)
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", ns.DataCapture.PLAYER_REGEN_ENABLED)
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", ns.DataCapture.PLAYER_REGEN_DISABLED)
+	self:RegisterEvent("PLAYER_FLAGS_CHANGED", ns.DataCapture.PLAYER_FLAGS_CHANGED)
+	self:RegisterEvent("PLAYER_LEAVING_WORLD", ns.DataCapture.PLAYER_LEAVING_WORLD)
+	self:RegisterEvent("CHANNEL_UI_UPDATE", ns.DataCapture.CHANNEL_UI_UPDATE)
 	-- self.db.RegisterCallback("OnProfileChanged", function() end)
 
 	self:ScheduleRepeatingTimer("UpdateLDB", 5)
@@ -94,7 +107,6 @@ function DeathNote:OnDisable()
 	self:CancelAllTimers()
 end
 
--- Replaces AceConsole:Print so that the addon name can be localized
 function DeathNote:Print(...)
 	local str = "|cff33ff99" .. L["Death Note"] .. "|r: "
 	local count = select("#", ...)
